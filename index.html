@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analizador de Complejidad Operacional - Desconexiones Programadas</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --muted: #94a3b8;
+      --txt: #e5e7eb;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --blue: #3b82f6;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #0b1220, #0f172a 35%);
+      color: var(--txt);
+    }
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    p.muted { color: var(--muted); margin-top: 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 14px;
+    }
+    .panel {
+      background: rgba(17,24,39,.92);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+    }
+    .panel h2 { margin: 0 0 10px; font-size: 16px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .row > * { flex: 0 0 auto; }
+    input[type="file"], button, select, input[type="number"] {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      color: var(--txt);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+    button { cursor: pointer; }
+    button.primary { background: var(--blue); border-color: #2563eb; }
+    button:hover { filter: brightness(1.05); }
+    .cards {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .card {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      min-height: 78px;
+    }
+    .card .k { color: var(--muted); font-size: 12px; }
+    .card .v { font-size: 22px; font-weight: 700; margin-top: 3px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--border);
+      background: #0b1220;
+    }
+    .pill.ok { color: #bbf7d0; border-color: rgba(16,185,129,.45); background: rgba(16,185,129,.12); }
+    .pill.warn { color: #fde68a; border-color: rgba(245,158,11,.45); background: rgba(245,158,11,.12); }
+    .pill.bad { color: #fecaca; border-color: rgba(239,68,68,.45); background: rgba(239,68,68,.12); }
+    .pill.info { color: #bfdbfe; border-color: rgba(59,130,246,.45); background: rgba(59,130,246,.12); }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .weights {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+      gap: 8px;
+    }
+    .field {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+    }
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .field input { width: 100%; }
+
+    .stats-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .stats-item {
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px;
+      font-size: 13px;
+    }
+    .stats-item span { color: var(--muted); display: block; font-size: 12px; }
+
+    .table-wrap { overflow: auto; max-height: 420px; border-radius: 12px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #243042; text-align: left; white-space: nowrap; }
+    th { position: sticky; top: 0; background: #0b1220; z-index: 1; font-size: 12px; color: var(--muted); }
+    tr:hover td { background: rgba(59,130,246,.06); }
+    .small { font-size: 12px; color: var(--muted); }
+    .log {
+      white-space: pre-wrap;
+      background: #0b1220;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      min-height: 100px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .bar {
+      height: 10px;
+      background: #0b1220;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 6px;
+    }
+    .bar > div { height: 100%; background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444); }
+    .footer { margin-top: 10px; color: var(--muted); font-size: 12px; }
+    @media (max-width: 1100px) {
+      .grid, .two-col { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+      .weights { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Analizador de Complejidad Operacional (Desconexiones Programadas)</h1>
+    <p class="muted">Sube tu reporte <b>.xls</b> (Excel XML / SpreadsheetML) y calcula un índice de complejidad por orden y un resumen del día. Todo corre localmente en tu navegador (sin Python, sin enviar datos).</p>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>1) Cargar reporte</h2>
+        <div class="row">
+          <input id="fileInput" type="file" accept=".xls,.xml" />
+          <button id="btnProcesar" class="primary">Procesar archivo</button>
+          <button id="btnRecalcular">Recalcular</button>
+          <button id="btnExportar" disabled>Exportar CSV</button>
+        </div>
+        <div class="footer">Hoja esperada: <b>Ordenes programadas para el per</b>. Si el reporte cambia de formato a .xls binario clásico, habrá que usar una versión con librería (SheetJS).</div>
+
+        <div class="cards" id="cards">
+          <div class="card"><div class="k">Fecha trabajo</div><div class="v" id="cFecha">-</div></div>
+          <div class="card"><div class="k">Órdenes día</div><div class="v" id="cTotal">0</div></div>
+          <div class="card"><div class="k">ICO total</div><div class="v" id="cIcoTotal">0</div></div>
+          <div class="card"><div class="k">ICO promedio</div><div class="v" id="cIcoProm">0</div></div>
+          <div class="card"><div class="k">Pendientes</div><div class="v" id="cPend">0</div></div>
+          <div class="card"><div class="k">Normales</div><div class="v" id="cNorm">0</div></div>
+          <div class="card"><div class="k">Canceladas</div><div class="v" id="cCanc">0</div></div>
+          <div class="card"><div class="k">Pico de presión</div><div class="v" id="cPeak">-</div></div>
+        </div>
+
+        <div style="margin-top:12px;" class="two-col">
+          <div class="panel" style="padding:10px;">
+            <div class="row" style="justify-content:space-between; width:100%;">
+              <b>Semáforo del día</b>
+              <span id="badgeSemaforo" class="pill info">Sin calcular</span>
+            </div>
+            <div class="bar"><div id="barSemaforo" style="width:0%"></div></div>
+            <div class="small" id="txtSemaforo" style="margin-top:8px;">Sube un reporte para obtener evaluación.</div>
+          </div>
+          <div class="panel" style="padding:10px;">
+            <b>Resumen automático</b>
+            <div id="logResumen" class="log" style="margin-top:8px;">Sin datos.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>2) Configuración de pesos (ajustable)</h2>
+        <div class="weights">
+          <div class="field"><label>PT Tipo A</label><input id="wTipoA" type="number" step="0.1" value="8" /></div>
+          <div class="field"><label>PT Tipo B</label><input id="wTipoB" type="number" step="0.1" value="6" /></div>
+          <div class="field"><label>PT Tipo C</label><input id="wTipoC" type="number" step="0.1" value="4" /></div>
+          <div class="field"><label>PT Tipo D</label><input id="wTipoD" type="number" step="0.1" value="2" /></div>
+          <div class="field"><label>Peso por paso (Q pasos)</label><input id="wPaso" type="number" step="0.01" value="0.15" /></div>
+          <div class="field"><label>Máx pasos considerados</label><input id="wPasoCap" type="number" step="1" value="35" /></div>
+          <div class="field"><label>Penalización fuera de plazo</label><input id="wFueraPlazo" type="number" step="0.1" value="2" /></div>
+          <div class="field"><label>Penalización cancelada</label><input id="wCancelada" type="number" step="0.1" value="3" /></div>
+          <div class="field"><label>Duración >=6h</label><input id="wDur6" type="number" step="0.1" value="0.5" /></div>
+          <div class="field"><label>Duración >=8h</label><input id="wDur8" type="number" step="0.1" value="1.5" /></div>
+          <div class="field"><label>Duración >=10h</label><input id="wDur10" type="number" step="0.1" value="2.5" /></div>
+          <div class="field"><label>Clientes 1-9 / 10-49 / 50+</label><input id="wClientes" type="text" value="1,2,3" /></div>
+          <div class="field"><label>Umbral Media (ICO orden)</label><input id="thrMedia" type="number" step="0.1" value="8" /></div>
+          <div class="field"><label>Umbral Alta (ICO orden)</label><input id="thrAlta" type="number" step="0.1" value="13" /></div>
+        </div>
+
+        <div style="margin-top:12px" class="small">Contextos y tipos de desconexión tienen pesos por defecto dentro del código. Si quieres, después los dejamos 100% ajustables por UI.</div>
+        <div class="footer">Tip: parte con estos pesos y ajusta según tu experiencia real de saturación (1-2 semanas).</div>
+      </section>
+    </div>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2>3) Distribución y top órdenes complejas</h2>
+      <div class="stats-list" id="statsDist">
+        <div class="stats-item"><span>Complejidad Alta</span><b id="dAlta">0</b></div>
+        <div class="stats-item"><span>Complejidad Media</span><b id="dMedia">0</b></div>
+        <div class="stats-item"><span>Complejidad Baja</span><b id="dBaja">0</b></div>
+        <div class="stats-item"><span>Ventana pico (30 min)</span><b id="dVentana">-</b></div>
+      </div>
+
+      <div style="margin-top:12px" class="table-wrap">
+        <table id="tablaTop">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>N°</th>
+              <th>Tipo</th>
+              <th>Q pasos</th>
+              <th>Contexto</th>
+              <th>Resultado</th>
+              <th>ICO</th>
+              <th>Bucket</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="9" class="small">Sin datos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px;">
+      <h2>4) Vista resumida de todas las órdenes del día</h2>
+      <div class="table-wrap" style="max-height: 520px;">
+        <table id="tablaAll">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Fecha</th>
+              <th>Inicio solicitud</th>
+              <th>Fin solicitud</th>
+              <th>Tipo</th>
+              <th>Q pasos</th>
+              <th>Tipo contexto</th>
+              <th>Clientes afectados</th>
+              <th>Resultado</th>
+              <th>ICO</th>
+              <th>Bucket</th>
+              <th>Descripción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="12" class="small">Sin datos.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      rawFileName: null,
+      workbook: null,
+      params: {},
+      rows: [],
+      dayRows: [],
+      results: []
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function log(msg) {
+      $("logResumen").textContent = msg;
+    }
+
+    function parseNumber(v, fallback = 0) {
+      const n = Number(String(v ?? "").replace(",", "."));
+      return Number.isFinite(n) ? n : fallback;
+    }
+
+    function parseTriplet(text) {
+      const parts = String(text || "").split(",").map(x => parseNumber(x.trim(), 0));
+      return [parts[0] ?? 1, parts[1] ?? 2, parts[2] ?? 3];
+    }
+
+    function getConfig() {
+      const [c1, c2, c3] = parseTriplet($("wClientes").value);
+      return {
+        tipoA: parseNumber($("wTipoA").value, 8),
+        tipoB: parseNumber($("wTipoB").value, 6),
+        tipoC: parseNumber($("wTipoC").value, 4),
+        tipoD: parseNumber($("wTipoD").value, 2),
+        paso: parseNumber($("wPaso").value, 0.15),
+        pasoCap: parseNumber($("wPasoCap").value, 35),
+        fueraPlazo: parseNumber($("wFueraPlazo").value, 2),
+        cancelada: parseNumber($("wCancelada").value, 3),
+        dur6: parseNumber($("wDur6").value, 0.5),
+        dur8: parseNumber($("wDur8").value, 1.5),
+        dur10: parseNumber($("wDur10").value, 2.5),
+        cli1: c1, cli2: c2, cli3: c3,
+        thrMedia: parseNumber($("thrMedia").value, 8),
+        thrAlta: parseNumber($("thrAlta").value, 13)
+      };
+    }
+
+    function byLocalName(node, name) {
+      return Array.from(node.children || []).filter(el => el.localName === name);
+    }
+
+    function firstChildByLocalName(node, name) {
+      return Array.from(node.children || []).find(el => el.localName === name) || null;
+    }
+
+    function getAttrAnyNS(el, localName) {
+      if (!el || !el.attributes) return null;
+      for (const a of Array.from(el.attributes)) {
+        if (a.localName === localName) return a.value;
+      }
+      return null;
+    }
+
+    function parseSpreadsheetML(text) {
+      const doc = new DOMParser().parseFromString(text, 'application/xml');
+      const err = doc.querySelector('parsererror');
+      if (err) throw new Error('No se pudo parsear el archivo como XML. Este HTML soporta .xls XML (SpreadsheetML).');
+
+      const worksheets = Array.from(doc.getElementsByTagName('*')).filter(n => n.localName === 'Worksheet');
+      const sheets = {};
+
+      worksheets.forEach(ws => {
+        const name = getAttrAnyNS(ws, 'Name') || 'Hoja';
+        const table = firstChildByLocalName(ws, 'Table');
+        if (!table) return;
+
+        const rows = [];
+        let maxCol = 0;
+
+        byLocalName(table, 'Row').forEach(rowEl => {
+          const rowMap = {};
+          let cidx = 1;
+          byLocalName(rowEl, 'Cell').forEach(cellEl => {
+            const idxAttr = getAttrAnyNS(cellEl, 'Index');
+            if (idxAttr) cidx = parseInt(idxAttr, 10);
+            const dataEl = firstChildByLocalName(cellEl, 'Data');
+            rowMap[cidx] = dataEl ? (dataEl.textContent ?? '') : '';
+            cidx += 1;
+          });
+          if (Object.keys(rowMap).length) {
+            const localMax = Math.max(...Object.keys(rowMap).map(Number));
+            if (localMax > maxCol) maxCol = localMax;
+          }
+          rows.push(rowMap);
+        });
+
+        const dense = rows.map(r => {
+          const arr = [];
+          for (let i = 1; i <= maxCol; i++) arr.push(r[i] ?? '');
+          return arr;
+        });
+
+        sheets[name] = dense;
+      });
+
+      return sheets;
+    }
+
+    function getParamsMap(sheetRows) {
+      const out = {};
+      (sheetRows || []).forEach(r => {
+        const k = (r[0] || '').toString().trim();
+        if (k) out[k] = r[1] ?? '';
+      });
+      return out;
+    }
+
+    function parseDateFlexible(v) {
+      if (!v) return null;
+      const s = String(v).trim();
+      if (!s) return null;
+
+      // yyyy-mm-dd or yyyy-mm-dd hh:mm:ss
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+        const datePart = s.slice(0, 10);
+        return datePart;
+      }
+      // dd/mm/yyyy or dd/mm/yyyy hh:mm:ss
+      const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+      return null;
+    }
+
+    function parseTimeMinutes(v) {
+      const s = String(v || '').trim();
+      const m = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+      if (!m) return NaN;
+      const hh = Number(m[1]), mm = Number(m[2]);
+      return hh * 60 + mm;
+    }
+
+    function parseDurationHours(v) {
+      const s = String(v || '').trim();
+      const m = s.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+      if (!m) return NaN;
+      const hh = Number(m[1]), mm = Number(m[2]), ss = Number(m[3] || 0);
+      return hh + mm / 60 + ss / 3600;
+    }
+
+    function cleanText(v) {
+      return String(v ?? '').trim();
+    }
+
+    function toInt(v) {
+      const n = parseInt(String(v ?? '').replace(/[^0-9-]/g, ''), 10);
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function getTipoBaseWeight(tipo, cfg) {
+      const t = cleanText(tipo).toLowerCase();
+      if (t.includes('tipo a')) return cfg.tipoA;
+      if (t.includes('tipo b')) return cfg.tipoB;
+      if (t.includes('tipo c')) return cfg.tipoC;
+      if (t.includes('tipo d')) return cfg.tipoD;
+      if (t.includes('planificación forestal')) return 5;
+      if (t.includes('planificación acotada llvv')) return 4;
+      if (t.includes('planificación acotada')) return 3;
+      return 3;
+    }
+
+    function getContextWeight(ctx) {
+      const c = cleanText(ctx).toLowerCase();
+      if (c.includes('roce')) return 2.0;
+      if (c.includes('obras')) return 2.0;
+      if (c.includes('mantenimiento')) return 1.5;
+      if (c.includes('llvv')) return 1.5;
+      if (c.includes('ventas')) return 1.0;
+      if (c.includes('fndr')) return 1.0;
+      if (c.includes('pérdidas') || c.includes('perdidas')) return 1.0;
+      if (c.includes('otros')) return 1.0;
+      return 1.0;
+    }
+
+    function getTipoProgWeight(tipo) {
+      const t = cleanText(tipo).toLowerCase();
+      if (t.includes('estándares de calidad') || t.includes('estandares de calidad')) return 2.0;
+      if (t.includes('ordenanza órgano competente') || t.includes('ordenanza organo competente')) return 1.5;
+      if (t.includes('no reportable a sec')) return 0.5;
+      if (t.includes('programada (sin informe)')) return 0.0;
+      return 0.0;
+    }
+
+    function getCircuitoPenalty(circuito, cfg) {
+      const c = cleanText(circuito).toLowerCase();
+      return c.includes('fuera de plazo') ? cfg.fueraPlazo : 0;
+    }
+
+    function getResultadoPenalty(resultado, cfg) {
+      const r = cleanText(resultado).toLowerCase();
+      return r.includes('cancelada') ? -cfg.cancelada : 0;
+    }
+
+    function clientesWeight(n, cfg) {
+      if (n >= 50) return cfg.cli3;
+      if (n >= 10) return cfg.cli2;
+      if (n >= 1) return cfg.cli1;
+      return 0;
+    }
+
+    function durWeight(hours, cfg) {
+      if (!Number.isFinite(hours)) return 0;
+      if (hours >= 10) return cfg.dur10;
+      if (hours >= 8) return cfg.dur8;
+      if (hours >= 6) return cfg.dur6;
+      return 0;
+    }
+
+    function scoreOrder(row, cfg) {
+      let s = 0;
+      s += getTipoBaseWeight(row['Tipo'], cfg);
+      const pasos = Math.max(0, toInt(row['Q pasos']));
+      s += Math.min(pasos, cfg.pasoCap) * cfg.paso;
+      s += getContextWeight(row['Tipo de contexto']);
+      s += getTipoProgWeight(row['Tipo de desconexión programada']);
+      s += clientesWeight(toInt(row['Clientes afectados']), cfg);
+      s += durWeight(row.__dur_tareas_h, cfg);
+      s += getCircuitoPenalty(row['Circuito de aprobación'], cfg);
+      s += getResultadoPenalty(row['Resultado'], cfg);
+      return Math.max(0, Math.round(s * 100) / 100);
+    }
+
+    function bucket(score, cfg) {
+      if (score >= cfg.thrAlta) return 'Alta';
+      if (score >= cfg.thrMedia) return 'Media';
+      return 'Baja';
+    }
+
+    function inferFechaTrabajo(params, rows) {
+      const p = params['Fecha de trabajo:'] || params['Fecha trabajo:'] || '';
+      const fromParam = parseDateFlexible(p);
+      if (fromParam) return fromParam;
+
+      const counts = {};
+      rows.forEach(r => {
+        const d = parseDateFlexible(r['Fecha']);
+        if (d) counts[d] = (counts[d] || 0) + 1;
+      });
+      const arr = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+      return arr[0]?.[0] || null;
+    }
+
+    function computePeak(dayRows) {
+      const valid = dayRows.filter(r => Number.isFinite(r.__ini_m) && Number.isFinite(r.__fin_m) && !String(r['Resultado']||'').toLowerCase().includes('cancelada'));
+      let peak = { minute: null, count: 0 };
+      for (let m = 0; m < 1440; m += 30) {
+        let c = 0;
+        for (const r of valid) {
+          if (r.__ini_m <= m && r.__fin_m > m) c++;
+        }
+        if (c > peak.count) peak = { minute: m, count: c };
+      }
+      return peak;
+    }
+
+    function mmToHHMM(m) {
+      if (!Number.isFinite(m)) return 'N/D';
+      const hh = String(Math.floor(m / 60)).padStart(2, '0');
+      const mm = String(m % 60).padStart(2, '0');
+      return `${hh}:${mm}`;
+    }
+
+    function semaforoFromResults(results) {
+      const activas = results.filter(r => !String(r['Resultado']||'').toLowerCase().includes('cancelada'));
+      if (!activas.length) return { label: 'Baja', level: 'ok', pct: 10, text: 'No hay órdenes activas relevantes.' };
+
+      const icoTotal = activas.reduce((a,b)=>a+b.__ico,0);
+      const icoProm = icoTotal / activas.length;
+      const altas = activas.filter(r => r.__bucket === 'Alta').length;
+      const medias = activas.filter(r => r.__bucket === 'Media').length;
+
+      // Heurística simple: combinar promedio + proporción altas
+      const stress = Math.min(100, Math.round((icoProm * 4.8) + (altas / activas.length) * 35 + (medias / activas.length) * 10));
+      if (stress >= 72) return { label: 'Alta', level: 'bad', pct: stress, text: 'Operación exigente: alta carga/criticidad. Recomendable foco en secuencia, ventanas y seguimiento temprano.' };
+      if (stress >= 42) return { label: 'Media', level: 'warn', pct: stress, text: 'Operación moderada: revisar top órdenes complejas y solapes horarios.' };
+      return { label: 'Baja', level: 'ok', pct: stress, text: 'Operación manejable: monitoreo normal y atención a excepciones.' };
+    }
+
+    function parseWorkbookToRows(sheets) {
+      const paramsSheet = sheets['parámetros'] || sheets['parametros'] || sheets['Parámetros'] || sheets['Parametros'];
+      const opsSheet = sheets['Ordenes programadas para el per'];
+      if (!opsSheet) throw new Error('No encontré la hoja "Ordenes programadas para el per".');
+      if (!paramsSheet) throw new Error('No encontré la hoja "parámetros".');
+
+      const params = getParamsMap(paramsSheet);
+      if (!opsSheet[1]) throw new Error('La hoja de órdenes no tiene fila de encabezados esperada.');
+      const headers = opsSheet[1].map(h => cleanText(h));
+      const rawRows = opsSheet.slice(2).filter(r => Array.isArray(r) && r.some(v => cleanText(v) !== ''));
+      const rows = rawRows.map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = r[i] ?? '');
+        obj.__fecha = parseDateFlexible(obj['Fecha']);
+        obj.__dur_tareas_h = parseDurationHours(obj['Duración de tareas programadas']);
+        obj.__ini_m = parseTimeMinutes(obj['Inicio solicitud']);
+        obj.__fin_m = parseTimeMinutes(obj['Fin solicitud']);
+        return obj;
+      });
+
+      return { params, rows };
+    }
+
+    function runAnalysis() {
+      if (!state.rows.length) {
+        log('Primero carga un archivo.');
+        return;
+      }
+
+      const cfg = getConfig();
+      const fechaTrabajo = inferFechaTrabajo(state.params, state.rows);
+      const dayRows = state.rows.filter(r => r.__fecha === fechaTrabajo);
+      const results = dayRows.map(r => {
+        const ico = scoreOrder(r, cfg);
+        return { ...r, __ico: ico, __bucket: bucket(ico, cfg) };
+      });
+
+      state.dayRows = dayRows;
+      state.results = results;
+
+      renderResults(fechaTrabajo, results);
+    }
+
+    function renderResults(fechaTrabajo, results) {
+      const total = results.length;
+      const pend = results.filter(r => String(r['Resultado']||'').toLowerCase().includes('pendiente')).length;
+      const norm = results.filter(r => String(r['Resultado']||'').toLowerCase().includes('normal')).length;
+      const canc = results.filter(r => String(r['Resultado']||'').toLowerCase().includes('cancelada')).length;
+      const activas = results.filter(r => !String(r['Resultado']||'').toLowerCase().includes('cancelada'));
+      const icoTotal = activas.reduce((a,b)=>a+b.__ico,0);
+      const icoProm = activas.length ? icoTotal/activas.length : 0;
+      const peak = computePeak(results);
+
+      const altas = results.filter(r => r.__bucket === 'Alta').length;
+      const medias = results.filter(r => r.__bucket === 'Media').length;
+      const bajas = results.filter(r => r.__bucket === 'Baja').length;
+
+      $('cFecha').textContent = fechaTrabajo || '-';
+      $('cTotal').textContent = String(total);
+      $('cIcoTotal').textContent = icoTotal.toFixed(1);
+      $('cIcoProm').textContent = icoProm.toFixed(2);
+      $('cPend').textContent = String(pend);
+      $('cNorm').textContent = String(norm);
+      $('cCanc').textContent = String(canc);
+      $('cPeak').textContent = peak.minute == null ? 'N/D' : `${mmToHHMM(peak.minute)} (${peak.count})`;
+
+      $('dAlta').textContent = String(altas);
+      $('dMedia').textContent = String(medias);
+      $('dBaja').textContent = String(bajas);
+      $('dVentana').textContent = peak.minute == null ? 'N/D' : `${mmToHHMM(peak.minute)} - ${mmToHHMM(peak.minute + 30)} (${peak.count} activas)`;
+
+      const sem = semaforoFromResults(results);
+      const badge = $('badgeSemaforo');
+      badge.textContent = `Complejidad ${sem.label}`;
+      badge.className = `pill ${sem.level}`;
+      $('barSemaforo').style.width = `${sem.pct}%`;
+      $('txtSemaforo').textContent = `${sem.text} (stress score: ${sem.pct}/100)`;
+
+      const top = [...results].sort((a,b)=>b.__ico-a.__ico).slice(0, 10);
+      const tbodyTop = $('tablaTop').querySelector('tbody');
+      tbodyTop.innerHTML = '';
+      if (!top.length) {
+        tbodyTop.innerHTML = '<tr><td colspan="9" class="small">Sin datos para la fecha de trabajo.</td></tr>';
+      } else {
+        top.forEach((r, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>${escapeHtml(r['N°'])}</td>
+            <td>${escapeHtml(r['Tipo'])}</td>
+            <td>${escapeHtml(r['Q pasos'])}</td>
+            <td>${escapeHtml(r['Tipo de contexto'])}</td>
+            <td>${escapeHtml(r['Resultado'])}</td>
+            <td><b>${r.__ico.toFixed(2)}</b></td>
+            <td>${bucketPill(r.__bucket)}</td>
+            <td title="${escapeHtml(r['Descripción del trabajo'])}">${escapeHtml((r['Descripción del trabajo']||'').slice(0,90))}</td>
+          `;
+          tbodyTop.appendChild(tr);
+        });
+      }
+
+      const tbodyAll = $('tablaAll').querySelector('tbody');
+      tbodyAll.innerHTML = '';
+      if (!results.length) {
+        tbodyAll.innerHTML = '<tr><td colspan="12" class="small">Sin datos para la fecha de trabajo.</td></tr>';
+      } else {
+        [...results].sort((a,b)=>b.__ico-a.__ico).forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHtml(r['N°'])}</td>
+            <td>${escapeHtml(r['Fecha'])}</td>
+            <td>${escapeHtml(r['Inicio solicitud'])}</td>
+            <td>${escapeHtml(r['Fin solicitud'])}</td>
+            <td>${escapeHtml(r['Tipo'])}</td>
+            <td>${escapeHtml(r['Q pasos'])}</td>
+            <td>${escapeHtml(r['Tipo de contexto'])}</td>
+            <td>${escapeHtml(r['Clientes afectados'])}</td>
+            <td>${escapeHtml(r['Resultado'])}</td>
+            <td><b>${r.__ico.toFixed(2)}</b></td>
+            <td>${bucketPill(r.__bucket)}</td>
+            <td title="${escapeHtml(r['Descripción del trabajo'])}">${escapeHtml((r['Descripción del trabajo']||'').slice(0,100))}</td>
+          `;
+          tbodyAll.appendChild(tr);
+        });
+      }
+
+      const topAlta = top.filter(r=>r.__bucket==='Alta').length;
+      const resumen = [
+        `Archivo: ${state.rawFileName || 'N/D'}`,
+        `Fecha de trabajo analizada: ${fechaTrabajo || 'N/D'}`,
+        `Órdenes del día: ${total} (Pendientes: ${pend}, Normales: ${norm}, Canceladas: ${canc})`,
+        `ICO total (sin canceladas): ${icoTotal.toFixed(1)} | ICO promedio: ${icoProm.toFixed(2)}`,
+        `Distribución: Alta=${altas}, Media=${medias}, Baja=${bajas}`,
+        `Pico de presión (ventana de solicitud 30 min): ${peak.minute == null ? 'N/D' : `${mmToHHMM(peak.minute)}-${mmToHHMM(peak.minute+30)} con ${peak.count} activas`}`,
+        `Lectura rápida: ${sem.label === 'Alta' ? 'día exigente' : sem.label === 'Media' ? 'día moderado con focos' : 'día manejable'}; revisar top ${Math.min(5, top.length)} órdenes por tipo/PT/pasos/contexto.`
+      ].join('\n');
+      log(resumen);
+
+      $('btnExportar').disabled = !results.length;
+    }
+
+    function bucketPill(b) {
+      const cls = b === 'Alta' ? 'bad' : (b === 'Media' ? 'warn' : 'ok');
+      return `<span class="pill ${cls}">${b}</span>`;
+    }
+
+    function escapeHtml(v) {
+      return String(v ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function exportCSV() {
+      if (!state.results.length) return;
+      const cols = [
+        'N°','Fecha','Inicio solicitud','Fin solicitud','Tipo','Q pasos','Tipo de desconexión programada','Tipo de contexto','Clientes afectados','Resultado','Circuito de aprobación','Descripción del trabajo'
+      ];
+      const headers = [...cols, 'ICO_orden', 'Complejidad'];
+      const rows = state.results.map(r => [
+        ...cols.map(c => r[c] ?? ''),
+        r.__ico,
+        r.__bucket
+      ]);
+      const csv = [headers, ...rows]
+        .map(arr => arr.map(cell => '"' + String(cell ?? '').replaceAll('"','""') + '"').join(';'))
+        .join('\n');
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analisis_complejidad_${(state.results[0]?.__fecha || 'dia')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function processSelectedFile() {
+      const file = $('fileInput').files?.[0];
+      if (!file) {
+        log('Selecciona un archivo .xls primero.');
+        return;
+      }
+      state.rawFileName = file.name;
+      try {
+        const text = await file.text();
+        const sheets = parseSpreadsheetML(text);
+        state.workbook = sheets;
+        const { params, rows } = parseWorkbookToRows(sheets);
+        state.params = params;
+        state.rows = rows;
+        runAnalysis();
+      } catch (e) {
+        console.error(e);
+        log('Error: ' + (e.message || e));
+      }
+    }
+
+    $('btnProcesar').addEventListener('click', processSelectedFile);
+    $('btnRecalcular').addEventListener('click', runAnalysis);
+    $('btnExportar').addEventListener('click', exportCSV);
+
+    // Enter para recalcular si editan inputs
+    document.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') runAnalysis();
+      });
+    });
+  </script>
+</body>
+</html>
