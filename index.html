@@ -225,63 +225,7 @@
     </div>
 
     <section class="panel" style="margin-top:14px;">
-      <h2>3) Semáforo por CCD y Zonal (foco operativo)</h2>
-      <div class="small">Referencia aplicada: <b>FRONTEL → CCD Norte</b> | <b>SAESA / EDELAYSEN / LUZ OSORNO → CCD Sur</b>, con mapeo por <b>comuna + empresa</b>.</div>
-
-      <div class="two-col" style="margin-top:12px;">
-        <div>
-          <div class="row" style="justify-content:space-between; margin-bottom:6px; width:100%;">
-            <b>Semáforo por CCD</b>
-            <span id="ccdMeta" class="small">Sin datos</span>
-          </div>
-          <div class="table-wrap" style="max-height: 320px;">
-            <table id="tablaCCD">
-              <thead>
-                <tr>
-                  <th>CCD</th>
-                  <th>Semáforo</th>
-                  <th>Stress</th>
-                  <th>Órdenes</th>
-                  <th>Pend.</th>
-                  <th>Alta/Media</th>
-                  <th>ICO total</th>
-                  <th>ICO prom</th>
-                  <th>Pico</th>
-                  <th>Apoyo</th>
-                </tr>
-              </thead>
-              <tbody><tr><td colspan="10" class="small">Sin datos.</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div>
-          <div class="row" style="justify-content:space-between; margin-bottom:6px; width:100%;">
-            <b>Semáforo por Zonal (Comuna - Empresa)</b>
-            <span id="zonalMeta" class="small">Sin datos</span>
-          </div>
-          <div class="table-wrap" style="max-height: 320px;">
-            <table id="tablaZonal">
-              <thead>
-                <tr>
-                  <th>Comuna - Empresa</th>
-                  <th>CCD</th>
-                  <th>Semáforo</th>
-                  <th>Stress</th>
-                  <th>Órdenes</th>
-                  <th>ICO prom</th>
-                  <th>Pico</th>
-                </tr>
-              </thead>
-              <tbody><tr><td colspan="7" class="small">Sin datos.</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel" style="margin-top:14px;">
-      <h2>4) Distribución y top órdenes complejas</h2>
+      <h2>3) Distribución y top órdenes complejas</h2>
       <div class="stats-list" id="statsDist">
         <div class="stats-item"><span>Complejidad Alta</span><b id="dAlta">0</b></div>
         <div class="stats-item"><span>Complejidad Media</span><b id="dMedia">0</b></div>
@@ -312,7 +256,7 @@
     </section>
 
     <section class="panel" style="margin-top:14px;">
-      <h2>5) Vista resumida de todas las órdenes del día</h2>
+      <h2>4) Vista resumida de todas las órdenes del día</h2>
       <div class="table-wrap" style="max-height: 520px;">
         <table id="tablaAll">
           <thead>
@@ -351,136 +295,6 @@
 
     const $ = (id) => document.getElementById(id);
 
-    const RAW_COMUNA_EMPRESA_REF = `PURÉN - FRONTEL
-LUMACO - FRONTEL
-LOS SAUCES - FRONTEL
-ERCILLA - FRONTEL
-TRAIGUÉN - FRONTEL
-GALVARINO - FRONTEL
-HUALQUI - FRONTEL
-MELIPEUCO - FRONTEL
-CUNCO - FRONTEL
-VILCÚN - FRONTEL
-CHOLCHOL - FRONTEL
-QUILLECO - FRONTEL
-NEGRETE - FRONTEL
-LOS ÁNGELES - FRONTEL
-COLLIPULLI - FRONTEL
-PADRE LAS CASAS - FRONTEL
-TIRÚA - FRONTEL
-CURACAUTÍN - FRONTEL
-PINTO - FRONTEL
-SAAVEDRA - FRONTEL
-TEODORO SCHMIDT - FRONTEL
-SANTA BARBARA - FRONTEL
-CARAHUE - FRONTEL
-PERQUENCO - FRONTEL
-TEMUCO - FRONTEL
-LONQUIMAY - FRONTEL
-GORBEA - FRONTEL
-NUEVA IMPERIAL - FRONTEL
-MULCHÉN - FRONTEL
-VILLARRICA - FRONTEL
-SANTA JUANA - FRONTEL
-EL CARMEN - FRONTEL
-FREIRE - FRONTEL
-MÁFIL - SAESA
-DALCAHUE - SAESA
-QUEMCHI - SAESA
-CORRAL - SAESA
-LAGO RANCO - SAESA
-FUTRONO - SAESA
-PANGUIPULLÍ - SAESA
-VILLARRICA - SAESA
-LANCO - SAESA
-LOS MUERMOS - SAESA
-MAULLÍN - SAESA
-MARIQUINA - SAESA
-LONCOCHE - SAESA
-PAILLACO - SAESA
-CHONCHI - SAESA
-CHAITÉN - EDELAYSEN
-CHILE CHICO - EDELAYSEN
-RÍO IBÁÑEZ - EDELAYSEN
-CISNES - EDELAYSEN
-SAN PABLO - LUZ OSORNO
-OSORNO - LUZ OSORNO
-SAN JUAN DE LA COSTA - LUZ OSORNO
-PUYEHUE - LUZ OSORNO
-RÍO NEGRO - LUZ OSORNO
-PUERTO OCTAY - LUZ OSORNO
-PUERTO VARAS - LUZ OSORNO
-LA UNIÓN - LUZ OSORNO
-RÁNQUIL - FRONTEL
-PEMUCO - FRONTEL
-FLORIDA - FRONTEL
-CONTULMO - FRONTEL
-ALTO BIOBIO - FRONTEL
-TOLTÉN - FRONTEL
-COCHAMÓ - SAESA
-HUALAIHUÉ - SAESA
-CALBUCO - SAESA
-PUERTO OCTAY - SAESA
-FUTALEUFÚ - EDELAYSEN
-quilaco - FRONTEL
-QUILLÓN - FRONTEL
-PITRUFQUÉN - FRONTEL
-GORBEA - SAESA
-CURACO DE VÉLEZ - SAESA
-SAN PABLO - SAESA
-SAN JUAN DE LA COSTA - SAESA
-TOLTÉN - SAESA
-PURRANQUE - LUZ OSORNO
-FRUTILLAR - LUZ OSORNO
-TOMÉ - FRONTEL
-PALENA - EDELAYSEN
-PUYEHUE - SAESA
-QUEILÉN - SAESA
-LAGO VERDE - EDELAYSEN
-NACIMIENTO - FRONTEL
-VICTORIA - FRONTEL
-ANGOL - FRONTEL
-TUCAPEL - FRONTEL
-LAUTARO - FRONTEL
-CAÑETE - FRONTEL
-ANCUD - SAESA
-LOS ALAMOS - FRONTEL
-LAJA - FRONTEL
-YUMBEL - FRONTEL
-FRUTILLAR - SAESA
-LEBU - FRONTEL
-LA UNIÓN - SAESA
-QUINCHAO - SAESA
-SAN ROSENDO - FRONTEL
-RENAICO - FRONTEL
-ARAUCO - FRONTEL
-COIHAIQUE - EDELAYSEN
-RÍO NEGRO - SAESA
-QUELLÓN - SAESA
-RÍO BUENO - SAESA
-LOS LAGOS - SAESA
-SAN IGNACIO - FRONTEL
-FRESIA - SAESA
-COCHRANE - EDELAYSEN
-ANTUCO - FRONTEL
-AISEN - EDELAYSEN
-PUERTO MONTT - SAESA
-YUNGAY - FRONTEL
-VALDIVIA - SAESA
-LLANQUIHUE - SAESA
-PUERTO VARAS - SAESA
-PURRANQUE - SAESA
-CURANILAHUE - FRONTEL
-BULNES - FRONTEL
-CASTRO - SAESA
-CABRERO - FRONTEL
-OSORNO - SAESA
-LOTA - FRONTEL
-CORONEL - FRONTEL
-PUQUELDÓN - SAESA
-RÍO BUENO - LUZ OSORNO
-CHILLÁN VIEJO - FRONTEL`;
-
     function log(msg) {
       $("logResumen").textContent = msg;
     }
@@ -511,8 +325,7 @@ CHILLÁN VIEJO - FRONTEL`;
         dur10: parseNumber($("wDur10").value, 2.5),
         cli1: c1, cli2: c2, cli3: c3,
         thrMedia: parseNumber($("thrMedia").value, 8),
-        thrAlta: parseNumber($("thrAlta").value, 13),
-        thrSupport: 70
+        thrAlta: parseNumber($("thrAlta").value, 13)
       };
     }
 
@@ -590,7 +403,13 @@ CHILLÁN VIEJO - FRONTEL`;
       if (!v) return null;
       const s = String(v).trim();
       if (!s) return null;
-      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+
+      // yyyy-mm-dd or yyyy-mm-dd hh:mm:ss
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+        const datePart = s.slice(0, 10);
+        return datePart;
+      }
+      // dd/mm/yyyy or dd/mm/yyyy hh:mm:ss
       const m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
       if (m) return `${m[3]}-${m[2]}-${m[1]}`;
       return null;
@@ -612,100 +431,13 @@ CHILLÁN VIEJO - FRONTEL`;
       return hh + mm / 60 + ss / 3600;
     }
 
-    function cleanText(v) { return String(v ?? '').trim(); }
-
-    function normalizeKey(v) {
-      return cleanText(v)
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, ' ')
-        .toUpperCase();
+    function cleanText(v) {
+      return String(v ?? '').trim();
     }
 
     function toInt(v) {
       const n = parseInt(String(v ?? '').replace(/[^0-9-]/g, ''), 10);
       return Number.isFinite(n) ? n : 0;
-    }
-
-    function normalizeCompanyName(v) {
-      const n = normalizeKey(v);
-      if (!n) return '';
-      if (n.includes('FRONTEL')) return 'FRONTEL';
-      if (n.includes('EDELAYSEN')) return 'EDELAYSEN';
-      if (n.includes('LUZ OSORNO') || n === 'LUZOSORNO') return 'LUZ OSORNO';
-      if (n.includes('SAESA')) return 'SAESA';
-      return '';
-    }
-
-    function companyToCCD(company) {
-      const c = normalizeCompanyName(company);
-      if (c === 'FRONTEL') return 'CCD NORTE';
-      if (c === 'SAESA' || c === 'EDELAYSEN' || c === 'LUZ OSORNO') return 'CCD SUR';
-      return 'SIN CCD';
-    }
-
-    function buildComunaEmpresaMaps(raw) {
-      const pairToCompany = new Map();
-      const communeCandidates = new Map();
-      const lines = String(raw || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-      for (const line of lines) {
-        const parts = line.split('-');
-        if (parts.length < 2) continue;
-        const empresaRaw = parts.pop();
-        const comunaRaw = parts.join('-');
-        const comuna = cleanText(comunaRaw);
-        const empresa = normalizeCompanyName(empresaRaw);
-        if (!comuna || !empresa) continue;
-        const ck = normalizeKey(comuna);
-        pairToCompany.set(`${ck}|${empresa}`, empresa);
-        if (!communeCandidates.has(ck)) communeCandidates.set(ck, new Set());
-        communeCandidates.get(ck).add(empresa);
-      }
-      const uniqueCommuneCompany = new Map();
-      for (const [ck, set] of communeCandidates.entries()) {
-        if (set.size === 1) uniqueCommuneCompany.set(ck, Array.from(set)[0]);
-      }
-      return { pairToCompany, uniqueCommuneCompany };
-    }
-
-    const COMUNA_EMPRESA_REF = buildComunaEmpresaMaps(RAW_COMUNA_EMPRESA_REF);
-
-    function splitCoverageComunaEmpresa(area) {
-      const raw = cleanText(area);
-      if (!raw) return { comuna: '', empresa: '' };
-      const parts = raw.split('-').map(p => cleanText(p)).filter(Boolean);
-      if (parts.length < 2) return { comuna: raw, empresa: '' };
-
-      const left = parts[0];
-      const right = parts[parts.length - 1];
-      const leftEmp = normalizeCompanyName(left);
-      const rightEmp = normalizeCompanyName(right);
-
-      if (rightEmp) return { comuna: cleanText(parts.slice(0, -1).join(' - ')), empresa: rightEmp };
-      if (leftEmp) return { comuna: cleanText(parts.slice(1).join(' - ')), empresa: leftEmp };
-      return { comuna: raw, empresa: '' };
-    }
-
-    function inferComunaEmpresaCCD(row) {
-      const areaCob = row['Área de cobertura'] ?? row['Area de cobertura'] ?? '';
-      const parsedArea = splitCoverageComunaEmpresa(areaCob);
-
-      const comunaRaw = cleanText(row['Comuna'] || row['Comuna afectada'] || parsedArea.comuna || areaCob || '');
-      let empresa = normalizeCompanyName(row['Empresa'] || row['Distribuidora'] || parsedArea.empresa || '');
-      const comunaKey = normalizeKey(comunaRaw);
-
-      if (!empresa && comunaKey) {
-        const unique = COMUNA_EMPRESA_REF.uniqueCommuneCompany.get(comunaKey);
-        if (unique) empresa = unique;
-      }
-      if (comunaKey && empresa) {
-        const exact = COMUNA_EMPRESA_REF.pairToCompany.get(`${comunaKey}|${empresa}`);
-        if (exact) empresa = exact;
-      }
-
-      const ccd = companyToCCD(empresa);
-      const comunaEmpresa = comunaRaw && empresa ? `${comunaRaw} - ${empresa}` : (cleanText(areaCob) || comunaRaw || '(Sin referencia)');
-      return { comuna: comunaRaw || '(Sin comuna)', empresa: empresa || '(Sin empresa)', ccd, comunaEmpresa };
     }
 
     function getTipoBaseWeight(tipo, cfg) {
@@ -791,6 +523,7 @@ CHILLÁN VIEJO - FRONTEL`;
       const p = params['Fecha de trabajo:'] || params['Fecha trabajo:'] || '';
       const fromParam = parseDateFlexible(p);
       if (fromParam) return fromParam;
+
       const counts = {};
       rows.forEach(r => {
         const d = parseDateFlexible(r['Fecha']);
@@ -828,19 +561,225 @@ CHILLÁN VIEJO - FRONTEL`;
       const icoProm = icoTotal / activas.length;
       const altas = activas.filter(r => r.__bucket === 'Alta').length;
       const medias = activas.filter(r => r.__bucket === 'Media').length;
-      const peak = computePeak(activas);
-      const peakFactor = Math.min(20, (peak.count || 0) * 2.5);
-      const volFactor = Math.min(18, activas.length * 0.55);
-      const stress = Math.min(100, Math.round((icoProm * 4.8) + (altas / activas.length) * 35 + (medias / activas.length) * 10 + peakFactor + volFactor));
 
+      // Heurística simple: combinar promedio + proporción altas
+      const stress = Math.min(100, Math.round((icoProm * 4.8) + (altas / activas.length) * 35 + (medias / activas.length) * 10));
       if (stress >= 72) return { label: 'Alta', level: 'bad', pct: stress, text: 'Operación exigente: alta carga/criticidad. Recomendable foco en secuencia, ventanas y seguimiento temprano.' };
       if (stress >= 42) return { label: 'Media', level: 'warn', pct: stress, text: 'Operación moderada: revisar top órdenes complejas y solapes horarios.' };
       return { label: 'Baja', level: 'ok', pct: stress, text: 'Operación manejable: monitoreo normal y atención a excepciones.' };
     }
 
-    function groupBy(arr, getKey) {
-      const m = new Map();
-      for (const item of arr) {
-        const k = getKey(it
+    function parseWorkbookToRows(sheets) {
+      const paramsSheet = sheets['parámetros'] || sheets['parametros'] || sheets['Parámetros'] || sheets['Parametros'];
+      const opsSheet = sheets['Ordenes programadas para el per'];
+      if (!opsSheet) throw new Error('No encontré la hoja "Ordenes programadas para el per".');
+      if (!paramsSheet) throw new Error('No encontré la hoja "parámetros".');
+
+      const params = getParamsMap(paramsSheet);
+      if (!opsSheet[1]) throw new Error('La hoja de órdenes no tiene fila de encabezados esperada.');
+      const headers = opsSheet[1].map(h => cleanText(h));
+      const rawRows = opsSheet.slice(2).filter(r => Array.isArray(r) && r.some(v => cleanText(v) !== ''));
+      const rows = rawRows.map(r => {
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = r[i] ?? '');
+        obj.__fecha = parseDateFlexible(obj['Fecha']);
+        obj.__dur_tareas_h = parseDurationHours(obj['Duración de tareas programadas']);
+        obj.__ini_m = parseTimeMinutes(obj['Inicio solicitud']);
+        obj.__fin_m = parseTimeMinutes(obj['Fin solicitud']);
+        return obj;
+      });
+
+      return { params, rows };
+    }
+
+    function runAnalysis() {
+      if (!state.rows.length) {
+        log('Primero carga un archivo.');
+        return;
+      }
+
+      const cfg = getConfig();
+      const fechaTrabajo = inferFechaTrabajo(state.params, state.rows);
+      const dayRows = state.rows.filter(r => r.__fecha === fechaTrabajo);
+      const results = dayRows.map(r => {
+        const ico = scoreOrder(r, cfg);
+        return { ...r, __ico: ico, __bucket: bucket(ico, cfg) };
+      });
+
+      state.dayRows = dayRows;
+      state.results = results;
+
+      renderResults(fechaTrabajo, results);
+    }
+
+    function renderResults(fechaTrabajo, results) {
+      const total = results.length;
+      const pend = results.filter(r => String(r['Resultado']||'').toLowerCase().includes('pendiente')).length;
+      const norm = results.filter(r => String(r['Resultado']||'').toLowerCase().includes('normal')).length;
+      const canc = results.filter(r => String(r['Resultado']||'').toLowerCase().includes('cancelada')).length;
+      const activas = results.filter(r => !String(r['Resultado']||'').toLowerCase().includes('cancelada'));
+      const icoTotal = activas.reduce((a,b)=>a+b.__ico,0);
+      const icoProm = activas.length ? icoTotal/activas.length : 0;
+      const peak = computePeak(results);
+
+      const altas = results.filter(r => r.__bucket === 'Alta').length;
+      const medias = results.filter(r => r.__bucket === 'Media').length;
+      const bajas = results.filter(r => r.__bucket === 'Baja').length;
+
+      $('cFecha').textContent = fechaTrabajo || '-';
+      $('cTotal').textContent = String(total);
+      $('cIcoTotal').textContent = icoTotal.toFixed(1);
+      $('cIcoProm').textContent = icoProm.toFixed(2);
+      $('cPend').textContent = String(pend);
+      $('cNorm').textContent = String(norm);
+      $('cCanc').textContent = String(canc);
+      $('cPeak').textContent = peak.minute == null ? 'N/D' : `${mmToHHMM(peak.minute)} (${peak.count})`;
+
+      $('dAlta').textContent = String(altas);
+      $('dMedia').textContent = String(medias);
+      $('dBaja').textContent = String(bajas);
+      $('dVentana').textContent = peak.minute == null ? 'N/D' : `${mmToHHMM(peak.minute)} - ${mmToHHMM(peak.minute + 30)} (${peak.count} activas)`;
+
+      const sem = semaforoFromResults(results);
+      const badge = $('badgeSemaforo');
+      badge.textContent = `Complejidad ${sem.label}`;
+      badge.className = `pill ${sem.level}`;
+      $('barSemaforo').style.width = `${sem.pct}%`;
+      $('txtSemaforo').textContent = `${sem.text} (stress score: ${sem.pct}/100)`;
+
+      const top = [...results].sort((a,b)=>b.__ico-a.__ico).slice(0, 10);
+      const tbodyTop = $('tablaTop').querySelector('tbody');
+      tbodyTop.innerHTML = '';
+      if (!top.length) {
+        tbodyTop.innerHTML = '<tr><td colspan="9" class="small">Sin datos para la fecha de trabajo.</td></tr>';
+      } else {
+        top.forEach((r, i) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${i+1}</td>
+            <td>${escapeHtml(r['N°'])}</td>
+            <td>${escapeHtml(r['Tipo'])}</td>
+            <td>${escapeHtml(r['Q pasos'])}</td>
+            <td>${escapeHtml(r['Tipo de contexto'])}</td>
+            <td>${escapeHtml(r['Resultado'])}</td>
+            <td><b>${r.__ico.toFixed(2)}</b></td>
+            <td>${bucketPill(r.__bucket)}</td>
+            <td title="${escapeHtml(r['Descripción del trabajo'])}">${escapeHtml((r['Descripción del trabajo']||'').slice(0,90))}</td>
+          `;
+          tbodyTop.appendChild(tr);
+        });
+      }
+
+      const tbodyAll = $('tablaAll').querySelector('tbody');
+      tbodyAll.innerHTML = '';
+      if (!results.length) {
+        tbodyAll.innerHTML = '<tr><td colspan="12" class="small">Sin datos para la fecha de trabajo.</td></tr>';
+      } else {
+        [...results].sort((a,b)=>b.__ico-a.__ico).forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHtml(r['N°'])}</td>
+            <td>${escapeHtml(r['Fecha'])}</td>
+            <td>${escapeHtml(r['Inicio solicitud'])}</td>
+            <td>${escapeHtml(r['Fin solicitud'])}</td>
+            <td>${escapeHtml(r['Tipo'])}</td>
+            <td>${escapeHtml(r['Q pasos'])}</td>
+            <td>${escapeHtml(r['Tipo de contexto'])}</td>
+            <td>${escapeHtml(r['Clientes afectados'])}</td>
+            <td>${escapeHtml(r['Resultado'])}</td>
+            <td><b>${r.__ico.toFixed(2)}</b></td>
+            <td>${bucketPill(r.__bucket)}</td>
+            <td title="${escapeHtml(r['Descripción del trabajo'])}">${escapeHtml((r['Descripción del trabajo']||'').slice(0,100))}</td>
+          `;
+          tbodyAll.appendChild(tr);
+        });
+      }
+
+      const topAlta = top.filter(r=>r.__bucket==='Alta').length;
+      const resumen = [
+        `Archivo: ${state.rawFileName || 'N/D'}`,
+        `Fecha de trabajo analizada: ${fechaTrabajo || 'N/D'}`,
+        `Órdenes del día: ${total} (Pendientes: ${pend}, Normales: ${norm}, Canceladas: ${canc})`,
+        `ICO total (sin canceladas): ${icoTotal.toFixed(1)} | ICO promedio: ${icoProm.toFixed(2)}`,
+        `Distribución: Alta=${altas}, Media=${medias}, Baja=${bajas}`,
+        `Pico de presión (ventana de solicitud 30 min): ${peak.minute == null ? 'N/D' : `${mmToHHMM(peak.minute)}-${mmToHHMM(peak.minute+30)} con ${peak.count} activas`}`,
+        `Lectura rápida: ${sem.label === 'Alta' ? 'día exigente' : sem.label === 'Media' ? 'día moderado con focos' : 'día manejable'}; revisar top ${Math.min(5, top.length)} órdenes por tipo/PT/pasos/contexto.`
+      ].join('\n');
+      log(resumen);
+
+      $('btnExportar').disabled = !results.length;
+    }
+
+    function bucketPill(b) {
+      const cls = b === 'Alta' ? 'bad' : (b === 'Media' ? 'warn' : 'ok');
+      return `<span class="pill ${cls}">${b}</span>`;
+    }
+
+    function escapeHtml(v) {
+      return String(v ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function exportCSV() {
+      if (!state.results.length) return;
+      const cols = [
+        'N°','Fecha','Inicio solicitud','Fin solicitud','Tipo','Q pasos','Tipo de desconexión programada','Tipo de contexto','Clientes afectados','Resultado','Circuito de aprobación','Descripción del trabajo'
+      ];
+      const headers = [...cols, 'ICO_orden', 'Complejidad'];
+      const rows = state.results.map(r => [
+        ...cols.map(c => r[c] ?? ''),
+        r.__ico,
+        r.__bucket
+      ]);
+      const csv = [headers, ...rows]
+        .map(arr => arr.map(cell => '"' + String(cell ?? '').replaceAll('"','""') + '"').join(';'))
+        .join('\n');
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analisis_complejidad_${(state.results[0]?.__fecha || 'dia')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function processSelectedFile() {
+      const file = $('fileInput').files?.[0];
+      if (!file) {
+        log('Selecciona un archivo .xls primero.');
+        return;
+      }
+      state.rawFileName = file.name;
+      try {
+        const text = await file.text();
+        const sheets = parseSpreadsheetML(text);
+        state.workbook = sheets;
+        const { params, rows } = parseWorkbookToRows(sheets);
+        state.params = params;
+        state.rows = rows;
+        runAnalysis();
+      } catch (e) {
+        console.error(e);
+        log('Error: ' + (e.message || e));
+      }
+    }
+
+    $('btnProcesar').addEventListener('click', processSelectedFile);
+    $('btnRecalcular').addEventListener('click', runAnalysis);
+    $('btnExportar').addEventListener('click', exportCSV);
+
+    // Enter para recalcular si editan inputs
+    document.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') runAnalysis();
+      });
+    });
+  </script>
 </body>
 </html>
